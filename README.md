@@ -1,243 +1,156 @@
-# Credit Data Analysis
+# Kreditdatenanalyse
 
-## Table of Contents
+## Inhaltsverzeichnis
 
-- [Executive Summary](#executive-summary)  
-- [Introduction & Objective](#introduction--objective)  
-- [Data Description](#data-description)  
-- [Methodology](#methodology)  
-- [Python Analysis](#python-analysis)  
-  - [Default Rate by Age Group](#default-rate-by-age-group)  
-  - [Employment Status Distribution](#employment-status-distribution)  
-  - [Interest Rate vs Credit Score](#interest-rate-vs-credit-score)  
-  - [Average Loan Amount by Purpose](#average-loan-amount-by-purpose)  
-- [R Analysis](#r-analysis)  
-  - [Default Rate by Annual Income Band](#default-rate-by-annual-income-band)  
-  - [Default Rate by Credit Score Band](#default-rate-by-credit-score-band)  
-  - [Default Rate by Education Level](#default-rate-by-education-level)  
-  - [Default Rate by Employment Status](#default-rate-by-employment-status)  
-  - [Default Rate by Loan Purpose](#default-rate-by-loan-purpose)  
-- [Conclusions & Recommendations](#conclusions--recommendations)  
-- [Appendix](#appendix)  
-
----
-
-## Executive Summary
-
-The analysis of Austrian consumer-loan data reveals that **age**, **employment**, **credit score**, **income**, and **loan purpose** are key drivers of default risk. Mid-career borrowers (36–55) exhibit the lowest defaults due to stable incomes and established credit histories, while the youngest and oldest cohorts face elevated risk from income volatility and fixed pensions. Full-time employed and retired borrowers default less frequently than students and part-timers, reflecting the availability of consistent cash flow. Credit score remains the most powerful predictor: default rates drop from **8.1 %** (“Poor”) to **0 %** (“Exceptional”), with associated interest spreads reflecting Basel III risk-based pricing and Austrian banks’ conservative risk management. Low-income borrowers (< €24 k) default at **4.4 %** versus **2.4 %** for high earners (> €60 k). Loan purposes backed by collateral (home improvement) carry lower risk than depreciating assets (cars). These insights suggest that lenders should calibrate underwriting and pricing to borrower profiles—favoring high-credit, high-income, stable-income segments and imposing stricter terms for riskier groups.
+- [Zusammenfassung](#zusammenfassung)  
+- [Einleitung & Zielsetzung](#einleitung--zielsetzung)  
+- [Datenbeschreibung](#datenbeschreibung)  
+- [Methodik](#methodik)  
+- [Python-Analyse](#python-analyse)  
+  - [Ausfallquote nach Altersgruppe](#ausfallquote-nach-altersgruppe)  
+  - [Verteilung nach Beschäftigungsstatus](#verteilung-nach-beschaeftigungsstatus)  
+  - [Zinssatz vs. Bonität](#zinssatz-vs-bonitaet)  
+  - [Durchschnittliche Darlehenshöhe nach Darlehenszweck](#durchschnittliche-darlehenshoehe-nach-darlehenszweck)  
+- [R-Analyse](#r-analyse)  
+  - [Ausfallquote nach Einkommensstufe](#ausfallquote-nach-einkommensstufe)  
+  - [Ausfallquote nach Bonität](#ausfallquote-nach-bonitaet)  
+  - [Ausfallquote nach Bildungsniveau](#ausfallquote-nach-bildungsniveau)  
+  - [Ausfallquote nach Beschäftigungsstatus](#ausfallquote-nach-beschaeftigungsstatus)  
+  - [Ausfallquote nach Darlehenszweck](#ausfallquote-nach-darlehenszweck)  
+- [Fazit & Empfehlungen](#fazit--empfehlungen)  
+- [Anhang](#anhang)  
 
 ---
 
-## Introduction & Objective
+## Zusammenfassung
 
-This report provides a detailed descriptive analysis of Austrian consumer-loan records to identify the demographic, financial, and loan-specific factors that influence default risk. The objectives are to:
+Die Analyse österreichischer Verbraucherdaten zeigt, dass Kreditnehmer:innen im Alter von 36–55 Jahren die höchste Bonität aufweisen. Ihre stabilen Einkommensstufen und Rücklagen senken die Ausfallquote signifikant. Junge Kreditnehmer:innen (18–25) sind häufig teilzeitbeschäftigt oder beziehen Studienbeihilfen, was zu unregelmässigen Einnahmen und höheren Ausfallquoten führt. Pensionist:innen verlassen sich auf fixe Renteneinkünfte, die nicht immer alle Lebenshaltungskosten abdecken. Vollzeitbeschäftigte und Pensionist:innen profitieren von planbaren Zahlungsströmen, während Studierende und Teilzeitbeschäftigte höhere Ausfallquoten aufweisen.
 
-1. Uncover which borrower segments exhibit higher or lower default rates.  
-2. Interpret these patterns through the lens of Austria’s economic, social, and regulatory environment.  
-3. Offer actionable recommendations for Austrian lenders to optimize credit policies, pricing strategies, and risk management.
+Die Bonität ist der stärkste Indikator: Personen mit Scores unter 580 tragen hohe Zinskosten und ein erhöhtes Ausfallrisiko, während Kreditnehmer:innen mit Scores ≥ 750 minimale Zinssätze erhalten und nahezu nie ausfallen. Einkommensstufen zeigen, dass bis € 24.000 jährlich oft knappe Budgets herrschen, während über € 60.000 ein finanzielles Polster schafft. Sanierungsdarlehen (Renovierungsdarlehen) verzeichnen geringere Ausfälle durch Immobilienbesicherung, während Autokredite wegen Wertminderung risikoreicher sind. Kleinere Konsum- und Ausbildungskredite werden meist rasch getilgt, können jedoch bei Studienabbruch oder unerwarteten Ereignissen ausfallen.
 
 ---
 
-## Data Description
+## Einleitung & Zielsetzung
 
-The dataset comprises anonymized consumer-loan records from Austrian lenders, including:  
-- **Demographics:** Age group, education level, employment status.  
-- **Financials:** Annual income band, credit score band, interest rate, loan amount.  
-- **Loan Details:** Purpose category (Car, Education, Furniture/Appliances, Home improvement, Other).  
-- **Outcome:** Binary indicator of default within 12 months.  
-
-Data aggregation by category preserves confidentiality while enabling robust subgroup analysis.
+Dieser Bericht beleuchtet das Ausfallverhalten österreichischer Verbraucherkredite. Ziel ist es, anhand demografischer Merkmale, finanzieller Daten und Darlehenszwecken herauszufinden, welche Kundensegmente besonders risikoreich sind und welche Faktoren dahinterstecken. Die Erkenntnisse sollen österreichischen Kreditinstituten helfen, Kreditentscheidungen, Zinsstrategien und Portfoliomanagement zu optimieren.
 
 ---
 
-## Methodology
+## Datenbeschreibung
 
-- **Tools:**  
-  - **Python** (pandas, Matplotlib, Seaborn) for exploratory analysis and interactive charts.  
-  - **R** (tidyverse, ggplot2) for detailed default-rate breakdowns and layered visualizations.  
-- **Process:**  
-  1. Calculate default rates per categorical band.  
-  2. Generate visualizations to identify trends and correlations.  
-  3. Contextualize findings within Austria’s socio-economic and regulatory framework.  
-- **Scope:** Descriptive analytics only; no predictive modeling. Emphasis on clarity and actionable insights.
+Die Daten umfassen anonymisierte Verbraucherkreditdaten österreichischer Institute mit:
 
----
+- **Demografie:** Altersgruppen (18–25, 26–35, 36–45, 46–55, 56–65, 66–75), Bildungsniveau, Beschäftigungsstatus  
+- **Finanzen:** Einkommensstufe (0–24 k, 24–60 k, 60 k+), Bonitätsband (Poor, Fair, Good, Very Good, Exceptional), Zinssatz, Darlehenshöhe  
+- **Darlehenszweck:** Auto, Ausbildung, Möbel/Haushalt, Sanierung, Sonstiges  
+- **Ergebnis:** Kreditausfall innerhalb von 12 Monaten (ja/nein)
 
-## Python Analysis
-
-### Default Rate by Age Group
-
-![Default Rate by Age Group](default_rate_by_age_group.png)
-
-#### Analysis  
-The U-shaped default curve suggests two primary risk drivers: **income volatility** among the young and **fixed-income constraints** among the elderly. Borrowers aged 18–25 lack steady employment and often carry educational debt, which, combined with entry-level wages, increases delinquency. Conversely, the 66–75 cohort relies heavily on pensions that may not keep pace with living costs or healthcare expenses, leading to strained budgets and higher default.
-
-#### Austrian Context  
-Austria’s NEET rate for 18–24 year-olds is around 12 %, indicating significant exposure among student borrowers who may juggle part-time work and studies. Meanwhile, pensioners receive a median pension of roughly €25.8 k, which can be eroded by rising healthcare and energy costs—a dynamic exacerbated by recent inflation.
-
-#### Sub-conclusion  
-Borrowers aged **36–55** are the safest segment, benefiting from peak earning years and low unemployment; extra caution is warranted for applicants under 26 or over 65.
+Alle Daten sind in Kategorien zusammengefasst, um den Datenschutz zu gewährleisten und dennoch detaillierte Analysen zu ermöglichen.
 
 ---
 
-### Employment Status Distribution
+## Methodik
 
-![Employment Status Distribution](employment_status_pie.png)
-
-#### Analysis  
-Full-time employed borrowers (55 %) default at **~3.2 %**, reflecting stable salaries and employer benefits. Students (5.1 % of the portfolio) default at **5.2 %**, driven by limited income and irregular payment capacity. Part-time workers and the unemployed show elevated defaults (~4 %), underscoring the risk of precarious or benefit-dependent incomes. Self-employed borrowers, while entrepreneurial, face cyclical business risks and thus default at **3.4 %**.
-
-#### Austrian Context  
-Generous unemployment benefits and a robust pension system cushion income shocks, but transitions (e.g., from unemployment to work) can create payment gaps. Austria’s vocational training system produces a stable self-employed segment, yet small business owners remain vulnerable to macroeconomic swings.
-
-#### Sub-conclusion  
-Standard full-time employees and retirees represent low-risk groups; enhanced documentation and co-signer requirements should apply for students, part-timers, and unemployed borrowers.
+1. **Datenaufbereitung:** Bereinigung und Kategorisierung in Python und R  
+2. **Ausfallquoten:** Berechnung der Ausfallquote je Kategorie  
+3. **Grafische Aufbereitung:** Darstellung mit Matplotlib/Seaborn (Python) und ggplot2 (R)  
+4. **Kontextanalyse:** Einordnung in das österreichische Arbeits- und Kreditmarktumfeld
 
 ---
 
-### Interest Rate vs Credit Score
+## Python-Analyse
 
-![Interest Rate vs Credit Score](interest_vs_credit_score.png)
+### Ausfallquote nach Altersgruppe
 
-#### Analysis  
-The pronounced negative correlation confirms that Austrian lenders employ **risk-based pricing**: borrowers with scores below 580 pay rates up to 15 % to offset higher expected losses, whereas those above 750 secure rates as low as 2 %. The steep drop in default—8.1 % for “Poor” to 0 % for “Exceptional”—validates Basel III capital allocation models and regulatory incentives for low-risk lending.
+![Ausfallquote nach Altersgruppe](images/default_rate_by_age_group.png)
 
-#### Austrian Context  
-Austria’s centralized credit bureaus (KSV/CRIF) provide comprehensive repayment histories, enabling granular score analytics. Regulatory caps on usury ensure interest spreads remain within EU guidelines, but banks still differentiate via score bands to manage risk and capital costs.
+Junge Kreditnehmer:innen (18–25) weisen die höchste Ausfallquote auf, da Studium und Teilzeitbeschäftigung oft nur unregelmässige Einnahmen sichern. Zwischen 26–35 sinkt die Quote, da Berufserfahrung und Doppelverdienerhaushalte Stabilität bringen. In der Altersgruppe 36–45 steigt sie leicht an, weil grössere Darlehen für Wohneigentum und Fahrzeuge aufgenommen werden. Die niedrigsten Ausfallquoten finden sich bei 46–55 und 56–65, wenn Schulden abgebaut und Rücklagen gebildet sind. Ab 66 Jahren steigen sie wieder, da Renten nicht alle Lebenshaltungskosten decken.
 
-#### Sub-conclusion  
-Credit score is the **primary lever** for both pricing and credit approval; automated workflows should fast-track Exceptional and Very Good scores while imposing manual review or higher collateral on Poor and Fair applicants.
+### Verteilung nach Beschäftigungsstatus
 
----
+![Verteilung nach Beschäftigungsstatus](images/employment_status_pie.png)
 
-### Average Loan Amount by Purpose
+Vollzeitbeschäftigte profitieren von regelmässigen Gehältern und Zusatzleistungen, was ihre Ausfallquote senkt. Pensionist:innen stützen sich auf planbare Rentenzahlungen und familiäre Unterstützung. Studierende verfügen über Studienbeihilfen und Nebenjobs, wodurch ihre Einnahmen schwanken. Teilzeit- und arbeitslose Kreditnehmer:innen sind auf begrenzte Leistungen angewiesen, die nicht dauerhaft Kredite bedienen. Selbstständige erleben Geschäftsschwankungen, was zu moderaten Ausfällen führt. Die Gruppe „Sonstiges“ umfasst oft abhängige Kreditnehmer:innen mit Bürgen.
 
-![Average Loan Amount by Purpose](loan_amount_by_purpose.png)
+### Zinssatz vs. Bonität
 
-#### Analysis  
-Car loans average €21 k—reflecting high vehicle ownership but also increasing exposure to depreciation. Home-improvement loans (€15 k) benefit from rising property values and collateral security, reducing loss severity despite mid-range principal. Education loans (€7 k) are smaller and combine public subsidies, leading to moderate default (3.4 %). Furniture/appliance financing (€9 k) and “Other” (€11 k) fill consumer demand but face less predictable resale value.
+![Zinssatz vs. Bonität](images/interest_vs_credit_score.png)
 
-#### Austrian Context  
-With a homeownership rate of 54.5 %, many borrowers leverage property equity for home projects at favorable rates or via subsidized energy-efficiency loans. Automotive financing growth correlates with urban-rural transport needs but introduces volatility as vehicles depreciate and maintenance costs rise.
+Kreditinstitute staffeln Zinssätze nach Bonität: Unter 580 zahlen Kreditnehmer:innen bis zu 15 %, um potenzielle Verluste abzudecken. Mit steigendem Score sinken die Zinsen deutlich; bei ≥ 750 liegen sie bei 2–3 % und die Ausfallquote ist minimal. Die meisten Kreditnehmer:innen befinden sich im mittleren Bonitätsbereich (580–700), weshalb Maßnahmen zur Score-Verbesserung essenziell sind.
 
-#### Sub-conclusion  
-Loan size and collateral quality vary by purpose: home-secured loans warrant larger amounts at lower rates, whereas auto and unsecured consumer loans require tighter limits and stronger underwriting.
+### Durchschnittliche Darlehenshöhe nach Darlehenszweck
 
-[💡 View the Python report](https://github.com/Dan103/Credit-Data-Analysis/blob/dd68f4f1668c9dab9b6f2bccefce564212432eda/Analysis.ipynb)
+![Durchschnittliche Darlehenshöhe nach Darlehenszweck](images/loan_amount_by_purpose.png)
+
+Autokredite führen zu den höchsten Durchschnittssummen (ca. € 21.000), da Fahrzeugkosten und Wertverluste das Risiko erhöhen. Sanierungsdarlehen liegen bei etwa € 15.000 und sind durch Immobilienwerte abgesichert. Möbel- und Haushaltskredite (rund € 9.000) bergen moderates Risiko, da die Sicherheiten weniger stabil sind. Ausbildungskredite (ca. € 7.000) sind kleiner und werden oft gefördert, können aber bei Studienabbruch ausfallen. Die Kategorie „Sonstiges“ deckt dringende Bedürfnisse ab, die meist prioritär bedient werden.
+
+[💡 Python-Bericht ansehen](https://github.com/Dan103/Credit-Data-Analysis/blob/dd68f4f1668c9dab9b6f2bccefce564212432eda/Analysis.ipynb)
 
 ---
 
-## R Analysis
+## R-Analyse
 
-### Default Rate by Annual Income Band
+### Ausfallquote nach Einkommensstufe
 
-![Default Rate by Annual Income Band](default_rate_by_annual_income_band.png)
+![Ausfallquote nach Einkommensstufe](images/default_rate_by_annual_income_band.png)
 
-#### Analysis  
-A clear inverse relationship shows default falling from **4.4 %** (0–24 k) to **2.4 %** (60 k+). Low-income borrowers often have limited savings buffers and may prioritize essential expenses over debt service. The middle band (24–60 k) experiences transitional financial stress—covering mortgages, family costs, and consumer credit.
+Niedrige Einkommensstufen (0–24 k) weisen die höchsten Ausfallquoten auf, da kaum Budgetspielraum für unerwartete Kosten besteht. In der mittleren Stufe (24–60 k) führen Familienausgaben und Hypotheken zu gelegentlichen Engpässen. Spitzenverdiener:innen (> 60 k) verfügen über Rücklagen und mehrere Einnahmequellen, was die Ausfallwahrscheinlichkeit minimiert.
 
-#### Austrian Context  
-Austria’s progressive tax regime and social transfers mitigate some income volatility, yet disposable income below €24 k remains tight, especially for single-income households or part-time workers. High-earning professionals benefit from diversified investments and dual-income families.
+### Ausfallquote nach Bonität
 
-#### Sub-conclusion  
-Income band is a **critical underwriting filter**: minimum income thresholds and scalable credit limits aligned to earnings can materially reduce default risk.
+![Ausfallquote nach Bonität](images/default_rate_by_credit_score_band.png)
 
----
+Die Ausfallquote sinkt von 8,1 % (Poor) auf 4,7 % (Fair) und weiter auf 2 % (Good). Sehr gute und ausgezeichnete Bonitätsklassen zeigen nahezu keine Ausfälle, was disziplinierte Rückzahlung und Vertrauen der Institute widerspiegelt.
 
-### Default Rate by Credit Score Band
+### Ausfallquote nach Bildungsniveau
 
-![Default Rate by Credit Score Band](default_rate_by_credit_score_band.png)
+![Ausfallquote nach Bildungsniveau](images/default_rate_by_education.png)
 
-#### Analysis  
-The default rate plunges from **8.1 %** (Poor) to **4.7 %** (Fair), then halves again to **2.0 %** (Good), culminating in **0 %** at Exceptional. This gradient underscores the non-linear impact of creditworthiness: small improvements in score yield outsized reductions in default probability.
+Kreditnehmer:innen mit Pflichtschulabschluss fallen etwas häufiger aus, da ihre Einkommenschancen eingeschränkt sind. Lehrabschluss- und AHS-Absolvent:innen profitieren vom dualen System und stabilen Gehältern. Universitätsabsolvent:innen zeigen ähnliche oder leicht bessere Werte, was die Effektivität der tertiären Bildung unterstreicht.
 
-#### Austrian Context  
-Robust reporting requirements for loans above €75 k enrich credit files, while even smaller loans feed data into bureaus. Banks leverage these insights to automate approvals, reducing operational costs and focusing manual underwriting on borderline cases.
+### Ausfallquote nach Beschäftigungsstatus
 
-#### Sub-conclusion  
-Credit score bands should map directly to credit policy tiers—automated approval for Good+, enhanced monitoring for Fair, and possibly denial or secured lending for Poor.
+![Ausfallquote nach Beschäftigungsstatus](images/default_rate_by_employment_status.png)
 
----
+Studierende und Teilzeitbeschäftigte haben die höchsten Ausfallrisiken, weil ihre Einnahmen unregelmässig sind. Arbeitslose sind auf staatliche Leistungen angewiesen, die nicht dauerhaft Kredite bedienen. Selbstständige genießen Einkommenspotenzial, leiden aber unter Marktschwankungen. Pensionist:innen und Festangestellte profitieren von festen Einnahmen und sozialen Netzen, was ihre Ausfälle reduziert.
 
-### Default Rate by Education Level
+### Ausfallquote nach Darlehenszweck
 
-![Default Rate by Education Level](default_rate_by_education.png)
+![Ausfallquote nach Darlehenszweck](images/default_rate_by_loan_purpose.png)
 
-#### Analysis  
-Default rates are narrowly clustered: **3.3 %–3.5 %**, with the least-educated slipping marginally higher. The minimal variance suggests that educational attainment per se is less predictive than income or credit score, though it may indirectly influence employability and earning potential.
+Autokredite liegen vorne, da Fahrzeuge schnell an Wert verlieren und Darlehenssummen hoch sind. Ausbildungskredite sind kleiner, aber riskant bei Studienabbruch. Möbel- und Haushaltskredite bergen mittleres Risiko, da Sicherheiten begrenzt sind. Sanierungsdarlehen werden durch Immobilienwerte gestützt, wodurch Ausfallquoten geringer ausfallen. Die Kategorie „Sonstiges“ deckt dringende Bedürfnisse ab, die meist prioritär bedient werden.
 
-#### Austrian Context  
-Austria’s dual education system (60 % in vocational tracks) delivers high employment outcomes across education levels. Lifelong learning programs and adult education inflate overall attainment, compressing default differences.
-
-#### Sub-conclusion  
-Education level offers **limited standalone value** for risk assessment in Austria; focus should remain on direct financial indicators.
+[💡 R-Bericht ansehen](https://dan103.github.io/Credit-Data-Analysis/Analysis.html)
 
 ---
 
-### Default Rate by Employment Status
+## Fazit & Empfehlungen
 
-![Default Rate by Employment Status](default_rate_by_employment_status.png)
+**Idealprofil:**  
+- Alter 36–55  
+- Vollzeit oder Pensionist:in  
+- Einkommen > € 60.000  
+- Bonität ≥ 700  
+- Sanierungsdarlehen
 
-#### Analysis  
-Students default at **5.2 %**, the highest of any group, followed by part-time (4.0 %) and unemployed (3.9 %). Full-time employed and retirees converge at **3.2 %**, reflecting consistent income streams. Self-employed (3.4 %) face more volatility than salaried workers but less than those with intermittent income.
+**Hochrisiko-Profil:**  
+- Unter 26 oder über 65  
+- Studierende, Teilzeit, arbeitslos  
+- Einkommen < € 24.000  
+- Bonität < 600  
+- Autokredit oder unbesicherter Konsumkredit
 
-#### Austrian Context  
-Generous unemployment benefits create a temporary cushion, but benefit exhaustion can precipitate defaults. Pensioners enjoy stable but limited cash flows, and high mandatory social contributions ensure income predictability for salaried workers.
-
-#### Sub-conclusion  
-Employment status is a **key risk dimension**—rigorous income verification, benefit documentation, and contingency planning are essential for non-standard workers.
-
----
-
-### Default Rate by Loan Purpose
-
-![Default Rate by Loan Purpose](default_rate_by_loan_purpose.png)
-
-#### Analysis  
-Car loans default at **3.9 %**, the highest, due to depreciation and larger average balances. Home-improvement loans default at **3.2 %**, buoyed by property equity. “Other” purposes (2.7 %) likely include emergency or short-tenor loans with immediate need and rapid payoff.
-
-#### Austrian Context  
-Austrian real estate markets have shown steady appreciation, reducing loss-given-default on mortgages and improvements. Automotive financing must account for resale value declines and maintenance cost variability, which amplify default risk.
-
-#### Sub-conclusion  
-Loan purpose should drive tailored underwriting: favor collateralized home loans, impose stricter down-payments or co-signers for auto and unsecured loans.
-
-[💡 View the R report](https://dan103.github.io/Credit-Data-Analysis/Analysis.html)
+**Empfehlungen:**  
+1. Zinssätze eng an Bonität und Einkommensstufe koppeln.  
+2. Mindesteinkommen und Beschäftigungsnachweise einfordern; Bürgschaften für risikoreiche Gruppen.  
+3. Feste Zinssätze und kürzere Laufzeiten für Risikogruppen anbieten.  
+4. Frühwarnmodelle für Studierende, Teilzeitkräfte und Geringverdiener implementieren.  
+5. Finanzbildung in Schulen und Unternehmen stärken.
 
 ---
 
-## Conclusions & Recommendations
+## Anhang
 
-- **Synthesis:**  
-  - **Demographics:** Ages 36–55, full-time employed or retired, with incomes > €24 k and credit scores ≥ 700, exhibit the lowest default rates.  
-  - **Financial Metrics:** Credit score and income are the strongest predictors of default; loan purpose and collateral quality further refine risk.  
-
-- **Strategic Recommendations:**  
-  - **Risk-Based Pricing:** Implement tiered interest rate bands tightly aligned to credit score and income.  
-  - **Underwriting Controls:** Require minimum income of €24 k, stable employment verification, and higher collateral or co-signers for high-risk segments.  
-  - **Product Design:** Offer fixed-rate, shorter-term loan products to borrowers vulnerable to interest rate fluctuations.  
-  - **Monitoring & Education:** Deploy early-warning systems for at-risk groups (students, part-timers) and provide targeted financial literacy programs.  
-
-- **Ideal Borrower Profile:**  
-  - Age 36–55,
-  - full-time employed,
-  - income > €60 k,
-  - credit score ≥ 700,
-  - financing home improvement.  
-
-- **Worst Borrower Profile:**  
-  - Age < 26 or > 65,
-  - student/part-time/unemployed,
-  - income < €24 k,
-  - credit score < 600,
-  - large car loan.  
-
----
-
-## Appendix
-
-- **Data Sources:** Internal Austrian bank portfolios, KSV/CRIF credit bureau.  
-- **Repositories:**  
-  - Python notebook: `Analysis.ipynb`  
-  - R scripts: `Analysis.R`  
-- **Supplemental Materials:** Regional breakdowns, term-length analyses, full data dictionary.
+- **Quellen:** Interne Bankdaten; KSV/CRIF.  
+- **Code:** Python (`Analysis.ipynb`), R (`Analysis.R`).  
+- **Weiteres:** Regionale Auswertungen, Laufzeitanalysen, Datenlexikon.  
