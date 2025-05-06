@@ -2,155 +2,243 @@
 
 ## Inhaltsverzeichnis
 
-- [Zusammenfassung](#zusammenfassung)  
-- [Einleitung & Zielsetzung](#einleitung--zielsetzung)  
-- [Datenbeschreibung](#datenbeschreibung)  
-- [Methodik](#methodik)  
-- [Python-Analyse](#python-analyse)  
-  - [Ausfallquote nach Altersgruppe](#ausfallquote-nach-altersgruppe)  
-  - [Verteilung nach Beschäftigungsstatus](#verteilung-nach-beschaeftigungsstatus)  
-  - [Zinssatz vs. Bonität](#zinssatz-vs-bonitaet)  
-  - [Durchschnittliche Darlehenshöhe nach Darlehenszweck](#durchschnittliche-darlehenshoehe-nach-darlehenszweck)  
-- [R-Analyse](#r-analyse)  
-  - [Ausfallquote nach Einkommensstufe](#ausfallquote-nach-einkommensstufe)  
-  - [Ausfallquote nach Bonität](#ausfallquote-nach-bonitaet)  
-  - [Ausfallquote nach Bildungsniveau](#ausfallquote-nach-bildungsniveau)  
-  - [Ausfallquote nach Beschäftigungsstatus](#ausfallquote-nach-beschaeftigungsstatus)  
-  - [Ausfallquote nach Darlehenszweck](#ausfallquote-nach-darlehenszweck)  
-- [Fazit & Empfehlungen](#fazit--empfehlungen)  
-- [Anhang](#anhang)  
+- [Executive Summary (Kurzfassung)](#executive-summary-kurzfassung)  
+- [Introduction & Objective (Einleitung & Zielsetzung)](#introduction--objective-einleitung--zielsetzung)  
+- [Data Description (Datenbeschreibung)](#data-description-datenbeschreibung)  
+- [Methodology (Methodik)](#methodology-methodik)  
+- [Python Analysis (Python-Analyse)](#python-analysis-python-analyse)  
+  - [Default Rate by Age Group (Ausfallquote nach Altersgruppe)](#default-rate-by-age-group-ausfallquote-nach-altersgruppe)  
+  - [Employment Status Distribution (Verteilung nach Beschäftigungsstatus)](#employment-status-distribution-verteilung-nach-beschaeftigungsstatus)  
+  - [Interest Rate vs Credit Score (Zinssatz vs. Bonität)](#interest-rate-vs-credit-score-zinssatz-vs-bonitaet)  
+  - [Average Loan Amount by Purpose (Durchschnittliche Darlehenshöhe nach Zweck)](#average-loan-amount-by-purpose-durchschnittliche-darlehenshoehe-nach-zweck)  
+- [R Analysis (R-Analyse)](#r-analysis-r-analyse)  
+  - [Default Rate by Annual Income Band (Ausfallquote nach Einkommensstufe)](#default-rate-by-annual-income-band-ausfallquote-nach-einkommensstufe)  
+  - [Default Rate by Credit Score Band (Ausfallquote nach Bonitätsband)](#default-rate-by-credit-score-band-ausfallquote-nach-bonitaetsband)  
+  - [Default Rate by Education Level (Ausfallquote nach Bildungsniveau)](#default-rate-by-education-level-ausfallquote-nach-bildungsniveau)  
+  - [Default Rate by Employment Status (Ausfallquote nach Beschäftigungsstatus)](#default-rate-by-employment-status-ausfallquote-nach-beschaeftigungsstatus)  
+  - [Default Rate by Loan Purpose (Ausfallquote nach Darlehenszweck)](#default-rate-by-loan-purpose-ausfallquote-nach-darlehenszweck)  
+- [Conclusions & Recommendations (Fazit & Empfehlungen)](#conclusions--recommendations-fazit--empfehlungen)  
+- [Appendix (Anhang)](#appendix-anhang)  
 
 ---
 
-## Zusammenfassung
+## Executive Summary (Kurzfassung)
 
-Die Analyse österreichischer Verbraucherdaten zeigt, dass Kreditnehmer:innen im Alter von 36–55 Jahren die höchste Bonität aufweisen. Ihre stabilen Einkommensstufen und Rücklagen senken die Ausfallquote signifikant. Junge Kreditnehmer:innen (18–25) sind häufig teilzeitbeschäftigt oder beziehen Studienbeihilfen, was zu unregelmässigen Einnahmen und höheren Ausfallquoten führt. Pensionist:innen verlassen sich auf fixe Renteneinkünfte, die nicht immer alle Lebenshaltungskosten abdecken. Vollzeitbeschäftigte und Pensionist:innen profitieren von planbaren Zahlungsströmen, während Studierende und Teilzeitbeschäftigte höhere Ausfallquoten aufweisen.
-
-Die Bonität ist der stärkste Indikator: Personen mit Scores unter 580 tragen hohe Zinskosten und ein erhöhtes Ausfallrisiko, während Kreditnehmer:innen mit Scores ≥ 750 minimale Zinssätze erhalten und nahezu nie ausfallen. Einkommensstufen zeigen, dass bis € 24.000 jährlich oft knappe Budgets herrschen, während über € 60.000 ein finanzielles Polster schafft. Sanierungsdarlehen (Renovierungsdarlehen) verzeichnen geringere Ausfälle durch Immobilienbesicherung, während Autokredite wegen Wertminderung risikoreicher sind. Kleinere Konsum- und Ausbildungskredite werden meist rasch getilgt, können jedoch bei Studienabbruch oder unerwarteten Ereignissen ausfallen.
+Die Analyse österreichischer Verbraucherkreditdaten zeigt, dass **Alter**, **Beschäftigungsstatus**, **Bonität**, **Einkommen** und **Darlehenszweck** die zentralen Treiber für die Ausfallquote sind. Kreditnehmer:innen im Kernalter (36–55) weisen dank stabiler Einkommensverhältnisse und etablierter Kreditverläufe die niedrigsten Ausfallquoten auf, während jüngere und ältere Kohorten aufgrund von Einkommensschwankungen bzw. fixen Pensionen erhöhten Risiken ausgesetzt sind. Vollzeitbeschäftigte und Pensionist:innen liegen unter dem Durchschnitt, Studierende und Teilzeitkräfte darüber. Die Bonität bleibt der stärkste Prädiktor: Die Ausfallquote sinkt von **8,1 %** („Poor“) auf **0 %** („Exceptional“), was sich in den risikobasierten Zinssätzen gemäß Basel III widerspiegelt. Niedrige Einkommensstufen (< € 24 000) fallen mit **4,4 %**, hohe Einkünfte (> € 60 000) mit **2,4 %** aus. Durch Immobilien besicherte Darlehen (Sanierung) sind risikoärmer als abschreibungsanfällige Finanzierung (Auto). Diese Erkenntnisse legen nahe, Underwriting und Pricing stringent an Profilen auszurichten: Bevorzugung von Bonität ≥ 700 und Einkommen > € 60 000, strengere Konditionen für Hochrisikogruppen.
 
 ---
 
-## Einleitung & Zielsetzung
+## Introduction & Objective (Einleitung & Zielsetzung)
 
-Dieser Bericht beleuchtet das Ausfallverhalten österreichischer Verbraucherkredite. Ziel ist es, anhand demografischer Merkmale, finanzieller Daten und Darlehenszwecken herauszufinden, welche Kundensegmente besonders risikoreich sind und welche Faktoren dahinterstecken. Die Erkenntnisse sollen österreichischen Kreditinstituten helfen, Kreditentscheidungen, Zinsstrategien und Portfoliomanagement zu optimieren.
+Dieser Bericht liefert eine deskriptive Analyse österreichischer Verbraucherkreditdaten, um demografische, finanzielle und zweckspezifische Einflussfaktoren auf das Ausfallrisiko zu identifizieren. Die Ziele sind:
+
+1. Ermittlung der Segmente mit höheren bzw. niedrigeren Ausfallquoten.  
+2. Kontextualisierung der Ergebnisse in Österreichs Wirtschafts-, Sozial- und Regulierungsumfeld.  
+3. Ableitung praxisrelevanter Empfehlungen für Kreditinstitute zur Optimierung von Kreditrichtlinien, Zinspolitik und Risikomanagement.
 
 ---
 
-## Datenbeschreibung
+## Data Description (Datenbeschreibung)
 
-Die Daten umfassen anonymisierte Verbraucherkreditdaten österreichischer Institute mit:
+Der Datensatz umfasst anonymisierte Verbraucherkreditdaten österreichischer Institute:
 
-- **Demografie:** Altersgruppen (18–25, 26–35, 36–45, 46–55, 56–65, 66–75), Bildungsniveau, Beschäftigungsstatus  
-- **Finanzen:** Einkommensstufe (0–24 k, 24–60 k, 60 k+), Bonitätsband (Poor, Fair, Good, Very Good, Exceptional), Zinssatz, Darlehenshöhe  
+- **Demografie:** Altersgruppe, Bildungsniveau, Beschäftigungsstatus  
+- **Finanzen:** Einkommensstufe, Bonitätsband, Zinssatz, Darlehenshöhe  
 - **Darlehenszweck:** Auto, Ausbildung, Möbel/Haushalt, Sanierung, Sonstiges  
 - **Ergebnis:** Kreditausfall innerhalb von 12 Monaten (ja/nein)
 
-Alle Daten sind in Kategorien zusammengefasst, um den Datenschutz zu gewährleisten und dennoch detaillierte Analysen zu ermöglichen.
+Die Aggregation nach Kategorien gewährleistet Datenschutz und ermöglicht dennoch detaillierte Subgruppenanalysen.
 
 ---
 
-## Methodik
+## Methodology (Methodik)
 
-1. **Datenaufbereitung:** Bereinigung und Kategorisierung in Python und R  
-2. **Ausfallquoten:** Berechnung der Ausfallquote je Kategorie  
-3. **Grafische Aufbereitung:** Darstellung mit Matplotlib/Seaborn (Python) und ggplot2 (R)  
-4. **Kontextanalyse:** Einordnung in das österreichische Arbeits- und Kreditmarktumfeld
-
----
-
-## Python-Analyse
-
-### Ausfallquote nach Altersgruppe
-
-![Ausfallquote nach Altersgruppe](images/default_rate_by_age_group.png)
-
-Junge Kreditnehmer:innen (18–25) weisen die höchste Ausfallquote auf, da Studium und Teilzeitbeschäftigung oft nur unregelmässige Einnahmen sichern. Zwischen 26–35 sinkt die Quote, da Berufserfahrung und Doppelverdienerhaushalte Stabilität bringen. In der Altersgruppe 36–45 steigt sie leicht an, weil grössere Darlehen für Wohneigentum und Fahrzeuge aufgenommen werden. Die niedrigsten Ausfallquoten finden sich bei 46–55 und 56–65, wenn Schulden abgebaut und Rücklagen gebildet sind. Ab 66 Jahren steigen sie wieder, da Renten nicht alle Lebenshaltungskosten decken.
-
-### Verteilung nach Beschäftigungsstatus
-
-![Verteilung nach Beschäftigungsstatus](images/employment_status_pie.png)
-
-Vollzeitbeschäftigte profitieren von regelmässigen Gehältern und Zusatzleistungen, was ihre Ausfallquote senkt. Pensionist:innen stützen sich auf planbare Rentenzahlungen und familiäre Unterstützung. Studierende verfügen über Studienbeihilfen und Nebenjobs, wodurch ihre Einnahmen schwanken. Teilzeit- und arbeitslose Kreditnehmer:innen sind auf begrenzte Leistungen angewiesen, die nicht dauerhaft Kredite bedienen. Selbstständige erleben Geschäftsschwankungen, was zu moderaten Ausfällen führt. Die Gruppe „Sonstiges“ umfasst oft abhängige Kreditnehmer:innen mit Bürgen.
-
-### Zinssatz vs. Bonität
-
-![Zinssatz vs. Bonität](images/interest_vs_credit_score.png)
-
-Kreditinstitute staffeln Zinssätze nach Bonität: Unter 580 zahlen Kreditnehmer:innen bis zu 15 %, um potenzielle Verluste abzudecken. Mit steigendem Score sinken die Zinsen deutlich; bei ≥ 750 liegen sie bei 2–3 % und die Ausfallquote ist minimal. Die meisten Kreditnehmer:innen befinden sich im mittleren Bonitätsbereich (580–700), weshalb Maßnahmen zur Score-Verbesserung essenziell sind.
-
-### Durchschnittliche Darlehenshöhe nach Darlehenszweck
-
-![Durchschnittliche Darlehenshöhe nach Darlehenszweck](images/loan_amount_by_purpose.png)
-
-Autokredite führen zu den höchsten Durchschnittssummen (ca. € 21.000), da Fahrzeugkosten und Wertverluste das Risiko erhöhen. Sanierungsdarlehen liegen bei etwa € 15.000 und sind durch Immobilienwerte abgesichert. Möbel- und Haushaltskredite (rund € 9.000) bergen moderates Risiko, da die Sicherheiten weniger stabil sind. Ausbildungskredite (ca. € 7.000) sind kleiner und werden oft gefördert, können aber bei Studienabbruch ausfallen. Die Kategorie „Sonstiges“ deckt dringende Bedürfnisse ab, die meist prioritär bedient werden.
-
-[💡 Python-Bericht ansehen](https://github.com/Dan103/Credit-Data-Analysis/blob/dd68f4f1668c9dab9b6f2bccefce564212432eda/Analysis.ipynb)
+- **Werkzeuge:**  
+  - **Python** (pandas, Matplotlib, Seaborn) für explorative Analysen und interaktive Charts  
+  - **R** (tidyverse, ggplot2) für feingliedrige Ausfallratenübersichten und mehrschichtige Visualisierungen  
+- **Vorgehen:**  
+  1. Berechnung der Ausfallquote je Kategorie  
+  2. Erstellung grafischer Darstellungen zur Erkennung von Trends und Korrelationen  
+  3. Einbettung der Erkenntnisse in Österreichs sozioökonomischen und regulatorischen Kontext  
+- **Umfang:** Deskriptive Analyse ohne prädiktive Modellierung; Fokus auf Klarheit und Umsetzbarkeit.
 
 ---
 
-## R-Analyse
+## Python Analysis (Python-Analyse)
 
-### Ausfallquote nach Einkommensstufe
+### Default Rate by Age Group (Ausfallquote nach Altersgruppe)
 
-![Ausfallquote nach Einkommensstufe](images/default_rate_by_annual_income_band.png)
+![Default Rate by Age Group](default_rate_by_age_group.png)
 
-Niedrige Einkommensstufen (0–24 k) weisen die höchsten Ausfallquoten auf, da kaum Budgetspielraum für unerwartete Kosten besteht. In der mittleren Stufe (24–60 k) führen Familienausgaben und Hypotheken zu gelegentlichen Engpässen. Spitzenverdiener:innen (> 60 k) verfügen über Rücklagen und mehrere Einnahmequellen, was die Ausfallwahrscheinlichkeit minimiert.
+**Analyse**  
+Die U-förmige Kurve signalisiert zwei Haupttreiber: Einkommensvolatilität bei jungen Kreditnehmer:innen (18–25) und fixe Pensionszahlungen bei älteren (66–75). Erstere kombinieren niedrige Einstiegsgehälter mit Studienverpflichtungen, letztere kämpfen mit steigenden Lebens­haltungs- und Gesundheitskosten.
 
-### Ausfallquote nach Bonität
+**Österreichischer Kontext**  
+Mit einer NEET-Quote von rund 12 % ist die junge Zielgruppe besonders exponiert. Pensionen in der Höhe von median € 25,8 k decken nicht immer alle Ausgaben ab, vor allem angesichts jüngster Inflationserhöhungen.
 
-![Ausfallquote nach Bonität](images/default_rate_by_credit_score_band.png)
+**Sub-Fazit**  
+Kreditnehmer:innen im Alter von **36–55** gelten als sicherstes Segment; für < 26 Jährige und > 65 Jährige ist erhöhte Sorgfalt angebracht.
 
-Die Ausfallquote sinkt von 8,1 % (Poor) auf 4,7 % (Fair) und weiter auf 2 % (Good). Sehr gute und ausgezeichnete Bonitätsklassen zeigen nahezu keine Ausfälle, was disziplinierte Rückzahlung und Vertrauen der Institute widerspiegelt.
+---
 
-### Ausfallquote nach Bildungsniveau
+### Employment Status Distribution (Verteilung nach Beschäftigungsstatus)
 
-![Ausfallquote nach Bildungsniveau](images/default_rate_by_education.png)
+![Employment Status Distribution](employment_status_pie.png)
 
-Kreditnehmer:innen mit Pflichtschulabschluss fallen etwas häufiger aus, da ihre Einkommenschancen eingeschränkt sind. Lehrabschluss- und AHS-Absolvent:innen profitieren vom dualen System und stabilen Gehältern. Universitätsabsolvent:innen zeigen ähnliche oder leicht bessere Werte, was die Effektivität der tertiären Bildung unterstreicht.
+**Analyse**  
+Vollzeitbeschäftigte (55 % Portfolio) fallen mit **3,2 %** am seltensten aus. Studierende (5,1 %) erreichen **5,2 %**, Teilzeit und Arbeitslose liegen bei rund **4 %**, Selbstständige bei **3,4 %**.
 
-### Ausfallquote nach Beschäftigungsstatus
+**Österreichischer Kontext**  
+Arbeitslosengeld und Pensionssystem puffern Einkommensschocks, doch Übergangsphasen können Zahlungslücken erzeugen. Das duale System stützt Selbstständige, jedoch bleiben KMU-Inhaber:innen konjunkturempfindlich.
 
-![Ausfallquote nach Beschäftigungsstatus](images/default_rate_by_employment_status.png)
+**Sub-Fazit**  
+Gängige Gruppen (Vollzeit, Pensionist:innen) sind risikoarm. Für Studierende, Teilzeitkräfte und Arbeitslose empfiehlt sich erweiterte Dokumentationspflicht bzw. Bürgschaft.
 
-Studierende und Teilzeitbeschäftigte haben die höchsten Ausfallrisiken, weil ihre Einnahmen unregelmässig sind. Arbeitslose sind auf staatliche Leistungen angewiesen, die nicht dauerhaft Kredite bedienen. Selbstständige genießen Einkommenspotenzial, leiden aber unter Marktschwankungen. Pensionist:innen und Festangestellte profitieren von festen Einnahmen und sozialen Netzen, was ihre Ausfälle reduziert.
+---
 
-### Ausfallquote nach Darlehenszweck
+### Interest Rate vs Credit Score (Zinssatz vs. Bonität)
 
-![Ausfallquote nach Darlehenszweck](images/default_rate_by_loan_purpose.png)
+![Interest Rate vs. Credit Score](interest_vs_credit_score.png)
 
-Autokredite liegen vorne, da Fahrzeuge schnell an Wert verlieren und Darlehenssummen hoch sind. Ausbildungskredite sind kleiner, aber riskant bei Studienabbruch. Möbel- und Haushaltskredite bergen mittleres Risiko, da Sicherheiten begrenzt sind. Sanierungsdarlehen werden durch Immobilienwerte gestützt, wodurch Ausfallquoten geringer ausfallen. Die Kategorie „Sonstiges“ deckt dringende Bedürfnisse ab, die meist prioritär bedient werden.
+**Analyse**  
+Ein starker negativer Zusammenhang bestätigt risikobasierte Preisbildung: Bonität < 580 → Zinssätze bis 15 %, Bonität ≥ 750 → 2–3 %. Die Ausfallquote fällt von 8,1 % auf 0 %.
 
-[💡 R-Bericht ansehen](https://dan103.github.io/Credit-Data-Analysis/Analysis.html)
+**Österreichischer Kontext**  
+KSV/CRIF liefern umfassende Scoring-Daten. Regulatorische Zinsobergrenzen nach EU-Recht begrenzen Usura, dennoch differenzieren Institute strikt nach Score-Bändern.
+
+**Sub-Fazit**  
+Die Bonität ist Haupthebel für Pricing und Kreditentscheidung. Automatisierte Prozesse sollten „Exceptional“ und „Very Good“ priorisieren, während „Poor“ und „Fair“ manuelle Prüfung bzw. zusätzliche Sicherheiten erfordern.
+
+---
+
+### Average Loan Amount by Purpose (Durchschnittliche Darlehenshöhe nach Zweck)
+
+![Average Loan Amount by Purpose](loan_amount_by_purpose.png)
+
+**Analyse**  
+Autokredite: Ø € 21 000 – hohe Exposition durch Abschreibung. Sanierungsdarlehen: Ø € 15 000 – implizite Besicherung durch Immobilien. Ausbildung: Ø € 7 000 – staatliche Förderungen, moderates Risiko. Möbel/Haushalt und Sonstiges: Ø € 9 000–11 000, ungesicherte Konsumkredite.
+
+**Österreichischer Kontext**  
+54,5 % Eigentumsquote ermöglichen günstige Energieeffizienz-Sanierungsdarlehen. Fahrzeugfinanzierung korreliert mit Pendelbedürfnissen, erzeugt jedoch Volatilität.
+
+**Sub-Fazit**  
+Zweckabhängig variiert Darlehenshöhe und Collateral-Qualität. Sanierungsdarlehen rechtfertigen höhere Limits, Auto- und ungesicherte Kredite strengere Underwriting-Limits.
+
+[💡 Python-Report ansehen](https://github.com/Dan103/Credit-Data-Analysis/blob/dd68f4f1668c9dab9b6f2bccefce564212432eda/Analysis.ipynb)
+
+---
+
+## R Analysis (R-Analyse)
+
+### Default Rate by Annual Income Band (Ausfallquote nach Einkommensstufe)
+
+![Default Rate by Annual Income Band](default_rate_by_annual_income_band.png)
+
+**Analyse**  
+Inverse Beziehung: 0–24 k → **4,4 %**, > 60 k → **2,4 %**. Geringverdienende verfügen über begrenzte Rücklagen und priorisieren oftmals Grundkosten.
+
+**Österreichischer Kontext**  
+Progressives Steuersystem und Sozialtransfers mildern Volatilität, doch < € 24 000 bleiben Einkommensengpässe – v. a. bei Alleinverdienern.
+
+**Sub-Fazit**  
+Einkommensstufe als zentrales Underwriting-Kriterium: Mindest­einkommen und skalierbare Kreditlimits senken das Risiko.
+
+---
+
+### Default Rate by Credit Score Band (Ausfallquote nach Bonitätsband)
+
+![Default Rate by Credit Score Band](default_rate_by_credit_score_band.png)
+
+**Analyse**  
+Anstieg in kleinen Score-Schritten führt zu überproportionalem Rückgang der Ausfälle von 8,1 % (Poor) auf 0 % (Exceptional).
+
+**Österreichischer Kontext**  
+Auch kleine Darlehen werden an KSV/CRIF gemeldet, was Scoring-Genauigkeit erhöht und automatisierte Entscheidungen fördert.
+
+**Sub-Fazit**  
+Score-Bänder sollten direkt Kredit­richtlinien zugeordnet werden: Automatisierung für Good+, verstärkte Prüfung für Fair und Poor.
+
+---
+
+### Default Rate by Education Level (Ausfallquote nach Bildungsniveau)
+
+![Default Rate by Education Level](default_rate_by_education.png)
+
+**Analyse**  
+Enge Bandbreite (3,3 %–3,5 %), marginal höhere Ausfälle bei Pflichtschulabschluss, was auf geringere Einkommenschancen rückschließen lässt.
+
+**Österreichischer Kontext**  
+Das duale System sorgt für hohe Beschäftigungsquoten across education levels, weshalb Bildungsniveau nur indirekten Einfluss auf Ausfälle hat.
+
+**Sub-Fazit**  
+Bildungsniveau liefert begrenzten Mehrwert für Risikobewertung; Fokus auf Finanz- und Bonitätskennzahlen bleibt zentral.
+
+---
+
+### Default Rate by Employment Status (Ausfallquote nach Beschäftigungsstatus)
+
+![Default Rate by Employment Status](default_rate_by_employment_status.png)
+
+**Analyse**  
+Studierende: 5,2 %, Teilzeit: 4,0 %, Arbeitslose: 3,9 %, Vollzeit & Pensionist:innen: 3,2 %, Selbstständige: 3,4 %.
+
+**Österreichischer Kontext**  
+Arbeitslosengeld dämpft kurzfristig, doch Leistungsauszahlungen und Benefit-Ende erzeugen Zahlungslücken. Hohe Sozialversicherungsabgaben stabilisieren Einkommen von Angestellten.
+
+**Sub-Fazit**  
+Beschäftigungsstatus ist Schlüssel­dimension: Strikte Einkommensnachweise und Benefit-Dokumentation für non-standard borrowers erforderlich.
+
+---
+
+### Default Rate by Loan Purpose (Ausfallquote nach Darlehenszweck)
+
+![Default Rate by Loan Purpose](default_rate_by_loan_purpose.png)
+
+**Analyse**  
+Autokredite: 3,9 %, Sanierung: 3,2 %, Sonstiges: 2,7 %. Höhere Ausfälle bei zweckbezogenen, ungesicherten Krediten.
+
+**Österreichischer Kontext**  
+Immobilienpreise steigen stabil, reduzieren LGD bei Sanierung. Fahrzeugfinanzierung bleibt anfällig für Abschreibung und variable Folgekosten.
+
+**Sub-Fazit**  
+Darlehenszweck muss Underwriting steuern: Collateralised Home Loans bevorzugen, Auto und Unsecured strengere Down-Payment-Anforderungen.
+
+[💡 R-Report ansehen](https://dan103.github.io/Credit-Data-Analysis/Analysis.html)
 
 ---
 
 ## Fazit & Empfehlungen
 
-**Idealprofil:**  
-- Alter 36–55  
-- Vollzeit oder Pensionist:in  
-- Einkommen > € 60.000  
-- Bonität ≥ 700  
-- Sanierungsdarlehen
+- **Zusammenfassung:**  
+  - **Demografie:** Alter 36–55, Vollzeit oder Pensionist:in, Einkommen > € 24 000, Bonität ≥ 700 → niedrigste Ausfallquoten.  
+  - **Finanzkennzahlen:** Bonität und Einkommen sind stärkste Prädiktoren; Darlehenszweck und Collateral-Qualität verfeinern das Risikoprofil.  
 
-**Hochrisiko-Profil:**  
-- Unter 26 oder über 65  
-- Studierende, Teilzeit, arbeitslos  
-- Einkommen < € 24.000  
-- Bonität < 600  
-- Autokredit oder unbesicherter Konsumkredit
+- **Strategische Empfehlungen:**  
+  1. **Risikobasierte Preisbildung:** Zinssätze streng an Bonität und Einkommen koppeln.  
+  2. **Underwriting-Kontrollen:** Mindest­einkommen € 24 000, stabile Beschäftigungsnachweise, höhere Sicherheiten/Bürgschaften für Hochrisikogruppen.  
+  3. **Produktgestaltung:** Kurzfristige, festverzinsliche Kredite für zins­empfindliche Kreditnehmer:innen.  
+  4. **Monitoring & Bildung:** Frühwarnsysteme für Studierende und Teilzeitkräfte; gezielte Finanzbildungsangebote.  
 
-**Empfehlungen:**  
-1. Zinssätze eng an Bonität und Einkommensstufe koppeln.  
-2. Mindesteinkommen und Beschäftigungsnachweise einfordern; Bürgschaften für risikoreiche Gruppen.  
-3. Feste Zinssätze und kürzere Laufzeiten für Risikogruppen anbieten.  
-4. Frühwarnmodelle für Studierende, Teilzeitkräfte und Geringverdiener implementieren.  
-5. Finanzbildung in Schulen und Unternehmen stärken.
+- **Idealprofil:**  
+  Alter 36–55,
+  Vollzeitbeschäftigt,
+  Einkommen > € 60 000,
+  Bonität ≥ 700,
+  Sanierungsdarlehen.  
+
+- **Worst-Case-Profil:**  
+  Alter < 26 oder > 65,
+  Studierende/Teilzeit/Arbeitslose,
+  Einkommen < € 24 000,
+  Bonität < 600,
+  hoher Autokredit.
 
 ---
 
-## Anhang
+## Appendix (Anhang)
 
-- **Quellen:** Interne Bankdaten; KSV/CRIF.  
-- **Code:** Python (`Analysis.ipynb`), R (`Analysis.R`).  
-- **Weiteres:** Regionale Auswertungen, Laufzeitanalysen, Datenlexikon.  
+- **Datenquellen:** Interne Bankdaten österreichischer Institute; KSV/CRIF.  
+- **Repositories:**  
+  - Python-Notebook: `Analysis.ipynb`  
+  - R-Skripte: `Analysis.R`  
+- **Zusatzmaterial:** Regionale Analysen, Laufzeitstudien, vollständiges Datenlexikon.  
